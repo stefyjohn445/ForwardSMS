@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="puerto_rico">#FF61BEB2</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="text_color">#FF3D3D3D</color>
+    <color name="hint_text_color">#FF898989</color>
+    <color name="screen_background">#FFF5F5F5</color>
+    <color name="install_button">#FF46C262</color>
+    <color name="divider">#FFDFDFDF</color>
+    <color name="uninstall_button">#FFFCFCFC</color>
+    <color name="switch_stroke">#FFF3F3F3</color>
+    <color name="menu_icons">#FFA4A4A4</color>
+    <color name="failure_message">#FFFF343A</color>
+</resources>
