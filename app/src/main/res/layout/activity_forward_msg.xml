@@ -57,9 +57,11 @@
 
     <TextView
         android:id="@+id/msgTV"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textAlignment="textStart"
+        android:justificationMode="inter_word"
         android:text="Msg"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,12 +69,35 @@
         app:layout_constraintTop_toBottomOf="@+id/dateTV"
         tools:ignore="MissingConstraints" />
 
+    <TextView
+        android:id="@+id/contactTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Contacts"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/msgTV"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contactRV"
+        android:layout_width="match_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="18dp"
+        android:layout_height="0dp"
+        android:background="@drawable/rounded_border"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contactTV"
+        app:layout_constraintBottom_toTopOf="@id/forwardSms"
+        tools:ignore="MissingConstraints" />
+
     <Button
         android:id="@+id/forwardSms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
         android:background="@drawable/button_background"
         android:fontFamily="@font/lato_black"
         android:text="Forward msg"

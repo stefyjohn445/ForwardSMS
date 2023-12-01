@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
             val date = dateEditText.text.toString()
             val doctorName = doctorNameEdT.text.toString()
 
-            if (time.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty()) {
+            if (time.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty()) { doctorNameEdT.clearFocus()
                dispatchCapturePictureIntent()
             } else {
                 Toast.makeText(this@MainActivity, "Please fill all the required fields", Toast.LENGTH_SHORT).show()

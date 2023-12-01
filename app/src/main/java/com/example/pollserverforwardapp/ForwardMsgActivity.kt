@@ -8,8 +8,12 @@ import android.telephony.SmsManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.pollserverforwardapp.adapters.ContactAdapter
 import com.example.pollserverforwardapp.models.ImageWithDataUploadResponse
 import com.example.pollserverforwardapp.models.Patient
+import com.google.gson.Gson
 
 class ForwardMsgActivity : AppCompatActivity() {
     private lateinit var forwardSmsButton: Button
@@ -21,7 +25,8 @@ class ForwardMsgActivity : AppCompatActivity() {
     private lateinit var msgTV: TextView
     private lateinit var forwardSms: Button
     private lateinit var nameAndPhoneNumbers: List<Patient>
-
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var contactAdapter: ContactAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +45,12 @@ class ForwardMsgActivity : AppCompatActivity() {
             dateTV.text = responseData.date
             msgTV.text = responseData.message
             nameAndPhoneNumbers = responseData.data
+
+            println("responseData contacts--$responseData.nameAndPhoneNumbers")
+            recyclerView = findViewById(R.id.contactRV)
+            recyclerView.layoutManager = LinearLayoutManager(this)
+            contactAdapter = ContactAdapter(nameAndPhoneNumbers)
+            recyclerView.adapter = contactAdapter
 
             forwardSmsButton.setOnClickListener {
                 if (isSmsPermissionGranted()) {
@@ -94,3 +105,4 @@ class ForwardMsgActivity : AppCompatActivity() {
         }
     }
 }
+
