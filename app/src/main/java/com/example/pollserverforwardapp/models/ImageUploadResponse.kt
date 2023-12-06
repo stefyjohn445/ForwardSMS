@@ -13,8 +13,8 @@ data class ImageWithDataUploadResponse (@SerializedName("doctor") val doctor: St
     ): Serializable
 
 data class Patient(
-    val name: String,
-    val number: String,
+    var name: String,
+    var number: String,
     val patient_id: String
 ): Serializable
 
