@@ -16,6 +16,8 @@ class ContactAdapter(private val contacts: List<Patient>) : RecyclerView.Adapter
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
+//        holder.setIsRecyclable(false)
+//        hasStableIds()
         val contact = contacts[position]
         holder.bind(contact)
     }

@@ -1,6 +1,6 @@
 package com.example.pollserverforwardapp.network
 
-
+import com.example.pollserverforwardapp.models.HistoryStatus
 import com.example.pollserverforwardapp.models.ImageWithDataUploadResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -13,8 +13,20 @@ interface RetrofitApiInterface {
     @POST("send_sms")
     fun uploadDataWithImage(
         @Part file: MultipartBody.Part,
-        @Part("time") time: RequestBody,
+        @Part("slot") slot: RequestBody,
         @Part("date") date: RequestBody,
         @Part("doctor_name") doctor_name: RequestBody
     ): Call<ImageWithDataUploadResponse>
+
+    @GET("history")
+    fun getDateHistory(): Call<List<String>>
+
+    @GET("history/{date}")
+    fun getSlotHistory(@Path("date") date: String): Call<List<String>>
+
+    @GET("history/{date}/{slot}")
+    fun getPatientStatusHistory(
+        @Path("date") date: String,
+        @Path("slot") slot: String
+    ): Call<List<HistoryStatus>>
 }
