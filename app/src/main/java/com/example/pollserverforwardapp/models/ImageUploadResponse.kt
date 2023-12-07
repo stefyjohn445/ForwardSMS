@@ -22,3 +22,8 @@ data class HistoryStatus( val name: String,
                           val number: String,
                           val status: String,
                           val patient_id: String): Serializable
+
+//data class Message( val message: String): Serializable
+data class Message(
+    @SerializedName("message") val message: String
+): Serializable

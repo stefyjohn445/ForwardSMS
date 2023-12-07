@@ -17,8 +17,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pollserverforwardapp.adapters.ContactAdapter
 import com.example.pollserverforwardapp.models.ImageWithDataUploadResponse
+import com.example.pollserverforwardapp.models.Message
 import com.example.pollserverforwardapp.models.Patient
+import com.example.pollserverforwardapp.network.RetrofitApiClient
+import com.example.pollserverforwardapp.network.RetrofitApiInterface
 import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListener {
     private lateinit var forwardSmsButton: Button
@@ -33,7 +39,13 @@ class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListen
     private lateinit var recyclerView: RecyclerView
     private lateinit var contactAdapter: ContactAdapter
 
-//    private lateinit var nameAndPhoneNumbers: MutableList<Patient>
+    companion object{
+        val apiInterface : RetrofitApiInterface = RetrofitApiClient.getUpload().create(
+            RetrofitApiInterface::class.java)
+    }
+
+
+    //    private lateinit var nameAndPhoneNumbers: MutableList<Patient>
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -203,15 +215,36 @@ class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListen
 //            // Update the patient details in the contacts list
             nameAndPhoneNumbers[position].name = updatedName
             nameAndPhoneNumbers[position].number = updatedNumber
+            val patientId = nameAndPhoneNumbers[position].patient_id
 //
 //            // Notify the adapter of the change
             contactAdapter.notifyItemChanged(position)
+
+            apiInterface.updateNumber(updatedNumber,patientId).enqueue(object :
+                Callback<Message> {
+                override fun onResponse(call: Call<Message>, response: Response<Message>) {
+                    if (response.isSuccessful) {
+                        // Handle API success response
+                        val message = response.body()?.message ?: "Update successful"
+                        Toast.makeText(this@ForwardMsgActivity, message, Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Handle API error response
+                        Toast.makeText(this@ForwardMsgActivity, "Failed to update", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Message>, t: Throwable) {
+                    // Handle API call failure
+                    Toast.makeText(this@ForwardMsgActivity, "Network Error", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
+
+
 
         dialog.setNegativeButton("Cancel") { _, _ ->
             // Handle cancel action if needed
         }
-//
         dialog.show()
     }
 }
