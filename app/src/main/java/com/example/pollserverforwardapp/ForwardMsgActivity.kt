@@ -8,6 +8,8 @@ import android.telephony.SmsManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pollserverforwardapp.adapters.ContactAdapter
@@ -68,16 +70,21 @@ class ForwardMsgActivity : AppCompatActivity() {
 
     private fun sendSms(responseData: ImageWithDataUploadResponse) {
         try {
-            val smsManager = SmsManager.getDefault()
+            val smsManager: SmsManager = SmsManager.getDefault()
            val message = responseData.message
+
             for (nameAndPhoneNumbers in nameAndPhoneNumbers) {
                 val number = nameAndPhoneNumbers.number
                 val name = nameAndPhoneNumbers.name
                 if (number != null) {
                     smsManager.sendTextMessage(number, null, message, null, null)
+                    Toast.makeText(this@ForwardMsgActivity, "Messages Sent", Toast.LENGTH_LONG).show()
                 }
             }
-            Toast.makeText(this@ForwardMsgActivity, "Messages Sent", Toast.LENGTH_LONG).show()
+        }catch (ex: SecurityException) {
+            // Handle SecurityException (Permission Issue)
+            Toast.makeText(this@ForwardMsgActivity, "Permission Denied", Toast.LENGTH_LONG).show()
+            ex.printStackTrace()
         } catch (ex: Exception) {
             Toast.makeText(this@ForwardMsgActivity, ex.message.toString(), Toast.LENGTH_LONG).show()
             ex.printStackTrace()
@@ -85,11 +92,20 @@ class ForwardMsgActivity : AppCompatActivity() {
     }
 
     private fun isSmsPermissionGranted(): Boolean {
-        return checkSelfPermission(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
+//        return checkSelfPermission(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.SEND_SMS
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestSmsPermission() {
-        requestPermissions(arrayOf(Manifest.permission.SEND_SMS), SEND_SMS_PERMISSION_REQUEST_CODE)
+//        requestPermissions(arrayOf(Manifest.permission.SEND_SMS), SEND_SMS_PERMISSION_REQUEST_CODE)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.SEND_SMS),
+            SEND_SMS_PERMISSION_REQUEST_CODE
+        )
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

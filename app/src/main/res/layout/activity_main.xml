@@ -82,12 +82,11 @@
         android:id="@+id/camaraButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/lato_black"
         android:text="Capture Image"
         android:textColor="@color/white"
         android:textSize="16sp"
-        android:fontFamily="@font/lato_black"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/infoTL"
         tools:ignore="MissingConstraints" />
@@ -96,9 +95,8 @@
         android:id="@+id/imageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:scaleType="centerCrop"
         android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/camaraButton"
         tools:ignore="MissingConstraints" />
@@ -130,5 +128,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/uploadFileBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload file"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/infoTL" />
+
+    <TextView
+        android:id="@+id/fileNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="file name"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/uploadFileBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
