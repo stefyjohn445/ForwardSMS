@@ -4,14 +4,26 @@ import com.google.gson.annotations.SerializedName
 import java.util.Date
 import java.io.Serializable
 
-data class ImageWithDataUploadResponse (@SerializedName("doctor_name") val doctor_name: String,
-                                        @SerializedName("date")val date: String, // Assuming the server sends back the uploaded image URL
-                                        @SerializedName("time")val time: String,
+data class ImageWithDataUploadResponse (@SerializedName("doctor") val doctor: String,
+                                        @SerializedName("slot")val slot: String,
+                                        @SerializedName("date")val date: String,
+                                        @SerializedName("url")val url: String,
                                         @SerializedName("message")val message: String,
                                         @SerializedName("data")val data: List<Patient>
     ): Serializable
 
 data class Patient(
-    val name: String,
-    val number: String
+    var name: String,
+    var number: String,
+    val patient_id: String
+): Serializable
+
+data class HistoryStatus( val name: String,
+                          val number: String,
+                          val status: String,
+                          val patient_id: String): Serializable
+
+//data class Message( val message: String): Serializable
+data class Message(
+    @SerializedName("message") val message: String
 ): Serializable

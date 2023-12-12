@@ -48,14 +48,33 @@
                 android:textSize="18sp"
                 android:text="Time: " />
 
+<!--            <EditText-->
+<!--                android:id="@+id/editTextTime"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="Select time"-->
+<!--                android:inputType="text"-->
+<!--                android:focusable="false"-->
+<!--                android:clickable="true"/>-->
+
             <EditText
                 android:id="@+id/editTextTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Select time"
                 android:inputType="text"
+                android:layout_centerInParent="true"
                 android:focusable="false"
-                android:clickable="true"/>
+
+                android:hint="Select Slot" />
+
+<!--            <Spinner-->
+<!--                android:id="@+id/spinner"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_below="@id/editTextTime"-->
+<!--                android:layout_centerHorizontal="true"-->
+<!--                android:visibility="gone" />-->
+
         </TableRow>
 
         <TableRow>

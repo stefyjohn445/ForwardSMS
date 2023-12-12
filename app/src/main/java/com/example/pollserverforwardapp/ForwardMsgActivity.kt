@@ -1,23 +1,35 @@
 package com.example.pollserverforwardapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.telephony.SmsManager
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+<<<<<<< HEAD
+=======
+import androidx.appcompat.app.AlertDialog
+>>>>>>> b24c43ec293dfa18eed851c82a61858f9451a950
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pollserverforwardapp.adapters.ContactAdapter
 import com.example.pollserverforwardapp.models.ImageWithDataUploadResponse
+import com.example.pollserverforwardapp.models.Message
 import com.example.pollserverforwardapp.models.Patient
+import com.example.pollserverforwardapp.network.RetrofitApiClient
+import com.example.pollserverforwardapp.network.RetrofitApiInterface
 import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class ForwardMsgActivity : AppCompatActivity() {
+class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListener {
     private lateinit var forwardSmsButton: Button
     private lateinit var responseData: ImageWithDataUploadResponse
     private val SEND_SMS_PERMISSION_REQUEST_CODE = 1001
@@ -30,9 +42,20 @@ class ForwardMsgActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var contactAdapter: ContactAdapter
 
+    companion object{
+        val apiInterface : RetrofitApiInterface = RetrofitApiClient.getUpload().create(
+            RetrofitApiInterface::class.java)
+    }
+
+
+    //    private lateinit var nameAndPhoneNumbers: MutableList<Patient>
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forward_msg)
+        nameAndPhoneNumbers = emptyList()
+
+//    nameAndPhoneNumbers = responseData.data.toMutableList()
 
         val responseData = intent.getSerializableExtra("responseData") as? ImageWithDataUploadResponse
         if (responseData != null) {
@@ -42,18 +65,20 @@ class ForwardMsgActivity : AppCompatActivity() {
             dateTV = findViewById(R.id.dateTV)
             msgTV = findViewById(R.id.msgTV)
             forwardSmsButton = findViewById(R.id.forwardSms)
-            nameTV.text = responseData.doctor_name
-            timeTV.text = responseData.time
+            nameTV.text = responseData.doctor
+            timeTV.text = responseData.slot
             dateTV.text = responseData.date
             msgTV.text = responseData.message
             nameAndPhoneNumbers = responseData.data
-
             println("responseData contacts--$responseData.nameAndPhoneNumbers")
             recyclerView = findViewById(R.id.contactRV)
             recyclerView.layoutManager = LinearLayoutManager(this)
-            contactAdapter = ContactAdapter(nameAndPhoneNumbers)
+
+            contactAdapter = ContactAdapter(nameAndPhoneNumbers, this)
             recyclerView.adapter = contactAdapter
 
+//            contactAdapter = ContactAdapter(nameAndPhoneNumbers)
+//            recyclerView.adapter = contactAdapter
             forwardSmsButton.setOnClickListener {
                 if (isSmsPermissionGranted()) {
                     // Permission is granted, proceed with sending SMS
@@ -72,12 +97,26 @@ class ForwardMsgActivity : AppCompatActivity() {
         try {
             val smsManager: SmsManager = SmsManager.getDefault()
            val message = responseData.message
+<<<<<<< HEAD
 
             for (nameAndPhoneNumbers in nameAndPhoneNumbers) {
                 val number = nameAndPhoneNumbers.number
                 val name = nameAndPhoneNumbers.name
                 if (number != null) {
                     smsManager.sendTextMessage(number, null, message, null, null)
+=======
+            val url = responseData.url
+            for (nameAndPhoneNumbers in nameAndPhoneNumbers) {
+                val number = nameAndPhoneNumbers.number
+                val name = nameAndPhoneNumbers.name
+                val patient_id = nameAndPhoneNumbers.patient_id
+                val messageURL = "$message$url$patient_id"
+                println("messageURL---$messageURL")
+                    if (number != null) {
+                    println("url-------$url")
+                    println("url-message-----$messageURL")
+                    smsManager.sendTextMessage(number, null, messageURL, null, null)
+>>>>>>> b24c43ec293dfa18eed851c82a61858f9451a950
                     Toast.makeText(this@ForwardMsgActivity, "Messages Sent", Toast.LENGTH_LONG).show()
                 }
             }
@@ -119,6 +158,106 @@ class ForwardMsgActivity : AppCompatActivity() {
                 Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    @SuppressLint("MissingInflatedId")
+//    override fun onContactEdit(patient: Patient, position: Int) {
+//        // Handle editing of the patient details here
+//        // For example, open an edit dialog or activity
+//        // Update the 'contacts' list in the adapter after editing
+//        // For example:
+//        // contacts[position] = updatedPatientDetails
+//        // contactAdapter.notifyItemChanged(position)
+////
+//        val dialog = AlertDialog.Builder(this@ForwardMsgActivity)
+//        val dialogView = layoutInflater.inflate(R.layout.edit_patient_dialog, null)
+//        dialog.setView(dialogView)
+//
+//        val editedName = dialogView.findViewById<EditText>(R.id.editedName)
+//        val editedNumber = dialogView.findViewById<EditText>(R.id.editedNumber)
+//
+//        // Populate dialog fields with existing patient details
+//        editedName.setText(patient.name)
+//        editedNumber.setText(patient.number)
+//
+//        dialog.setPositiveButton("Save") { _, _ ->
+//            val updatedName = editedName.text.toString()
+//            val updatedNumber = editedNumber.text.toString()
+//
+//            // Update the patient details in the contacts list
+//            contacts[position].name = updatedName
+//            contacts[position].number = updatedNumber
+//
+//            // Notify the adapter of the change
+//            contactAdapter.notifyItemChanged(position)
+//        }
+//
+//        dialog.setNegativeButton("Cancel") { _, _ ->
+//            // Handle cancel action if needed
+//        }
+//
+//        dialog.show()
+//    }
+
+    override fun onContactEdit(updatedName: String, updatedNumber: String, position: Int) {
+        // Handle editing of the patient details here
+        // For example, open an edit dialog or activity
+        // Update the 'contacts' list in the adapter after editing
+        // For example:
+        // contacts[position] = updatedPatientDetails
+        // contactAdapter.notifyItemChanged(position)
+//
+        val dialog = AlertDialog.Builder(this@ForwardMsgActivity)
+        val dialogView = layoutInflater.inflate(R.layout.edit_patient_dialog, null)
+        dialog.setView(dialogView)
+
+        val editedName = dialogView.findViewById<EditText>(R.id.editedName)
+        val editedNumber = dialogView.findViewById<EditText>(R.id.editedNumber)
+
+//        // Populate dialog fields with existing patient details
+//        editedName.setText(patient.name)
+//        editedNumber.setText(patient.number)
+        editedName.setText(updatedName)
+        editedNumber.setText(updatedNumber)
+//
+        dialog.setPositiveButton("Save") { _, _ ->
+            val updatedName = editedName.text.toString()
+            val updatedNumber = editedNumber.text.toString()
+//
+//            // Update the patient details in the contacts list
+            nameAndPhoneNumbers[position].name = updatedName
+            nameAndPhoneNumbers[position].number = updatedNumber
+            val patientId = nameAndPhoneNumbers[position].patient_id
+//
+//            // Notify the adapter of the change
+            contactAdapter.notifyItemChanged(position)
+
+            apiInterface.updateNumber(updatedNumber,patientId).enqueue(object :
+                Callback<Message> {
+                override fun onResponse(call: Call<Message>, response: Response<Message>) {
+                    if (response.isSuccessful) {
+                        // Handle API success response
+                        val message = response.body()?.message ?: "Update successful"
+                        Toast.makeText(this@ForwardMsgActivity, message, Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Handle API error response
+                        Toast.makeText(this@ForwardMsgActivity, "Failed to update", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Message>, t: Throwable) {
+                    // Handle API call failure
+                    Toast.makeText(this@ForwardMsgActivity, "Network Error", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+
+
+
+        dialog.setNegativeButton("Cancel") { _, _ ->
+            // Handle cancel action if needed
+        }
+        dialog.show()
     }
 }
 

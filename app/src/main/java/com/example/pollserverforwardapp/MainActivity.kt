@@ -3,6 +3,7 @@ package com.example.pollserverforwardapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -14,13 +15,18 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.telephony.SmsManager
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
+<<<<<<< HEAD
 import android.widget.TextView
+=======
+import android.widget.Spinner
+>>>>>>> b24c43ec293dfa18eed851c82a61858f9451a950
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -55,7 +61,7 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_IMAGE_CAPTURE = 101
     val description = "Description of the image"
     private val REQUEST_CAMERA_PERMISSION = 100
-    private lateinit var timeEditText: EditText
+    private lateinit var slotEditText: EditText
     private lateinit var calendar: Calendar
     private lateinit var dateEditText: EditText
     private lateinit var doctorNameEdT: EditText
@@ -67,7 +73,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fileNameTextView: TextView
     companion object{
         val apiInterface : RetrofitApiInterface = RetrofitApiClient.getUpload().create(RetrofitApiInterface::class.java)
-        private const val REQUEST_IMAGE_CAPTURE = 1
     }
 
 
@@ -76,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         confirmButton= findViewById(R.id.confirmButton)
-        timeEditText = findViewById(R.id.editTextTime)
+        slotEditText = findViewById(R.id.editTextTime)
         dateEditText = findViewById(R.id.editTextDate)
         doctorNameEdT = findViewById(R.id.doctorNameEdT)
         imageView = findViewById(R.id.imageView)
@@ -92,12 +97,23 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        slotEditText.setOnClickListener {
+            val items = arrayOf("09-10 am", "10-11 am","11-12 am","12-01 pm","01-02 pm", "03-04 pm", "05-06 pm")
+
+            val builder = AlertDialog.Builder(this)
+            builder.setItems(items) { dialog, which ->
+                val selectedValue = items[which]
+                slotEditText.setText(selectedValue)
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+
         calendar = Calendar.getInstance()
         if (!isSmsPermissionGranted()) {
             requestSmsPermission()
-        }
-        timeEditText.setOnClickListener {
-            showTimePickerDialog()
         }
 
         dateEditText.setOnClickListener {
@@ -105,11 +121,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         camaraButton.setOnClickListener {
-            val time = timeEditText.text.toString()
+            val slot = slotEditText.text.toString()
             val date = dateEditText.text.toString()
             val doctorName = doctorNameEdT.text.toString()
 
-            if (time.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty()) { doctorNameEdT.clearFocus()
+            if (slot.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty()) { doctorNameEdT.clearFocus()
                dispatchCapturePictureIntent()
             } else {
                 Toast.makeText(this@MainActivity, "Please fill all the required fields", Toast.LENGTH_SHORT).show()
@@ -117,23 +133,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         confirmButton.setOnClickListener {
-            val time = timeEditText.text.toString()
+            val slot = slotEditText.text.toString()
             val date = dateEditText.text.toString()
             val doctorName = doctorNameEdT.text.toString()
             progressBar.visibility = View.VISIBLE
 
-            if (time.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty() && imageFilePath != null) {
+            if (slot.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty() && imageFilePath != null) {
                 val imageFile = File(imageFilePath!!)
                 val requestFile = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
                 val body = MultipartBody.Part.createFormData("file", imageFile.name, requestFile)
-                val time = timeEditText.text.toString()
-                val date = dateEditText.text.toString()
-                val doctorName = doctorNameEdT.text.toString()
-                val timeRequestBody = time.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                val dateRequestBody = date.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                val doctorNameRequestBody = doctorName.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                val slotValue = slotEditText.text.toString()
+                val dateValue = dateEditText.text.toString()
+                val doctorNameValue = doctorNameEdT.text.toString()
+                val timeRequestBody = slotValue.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                val dateRequestBody = dateValue.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                val doctorNameRequestBody = doctorNameValue.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                println("response--data-$slotValue")
+                println("response--timeRequestBody-$timeRequestBody $dateRequestBody $doctorNameRequestBody ")
                 println("response--body-$body")
-                apiInterface.uploadDataWithImage(file = body , time = timeRequestBody, date = dateRequestBody, doctor_name = doctorNameRequestBody)
+                apiInterface.uploadDataWithImage(file = body , slot = timeRequestBody, date = dateRequestBody, doctor_name = doctorNameRequestBody)
                     .enqueue(object : Callback<ImageWithDataUploadResponse> {
                         override fun onResponse(call: Call<ImageWithDataUploadResponse>, response: Response<ImageWithDataUploadResponse>) {
                             if (response.isSuccessful) {
@@ -143,6 +161,7 @@ class MainActivity : AppCompatActivity() {
                                 val intent = Intent(this@MainActivity, ForwardMsgActivity::class.java)
                                 intent.putExtra("responseData", responseData)
                                 startActivity(intent)
+                                finish()
                                 Toast.makeText(this@MainActivity, "Data uploaded successfully", Toast.LENGTH_SHORT).show()
                             } else {
                                 progressBar.visibility = View.INVISIBLE
@@ -216,7 +235,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateDateEditText() {
-        val dateFormat = "dd/MM/yyyy"
+        val dateFormat = "dd-MM-yyyy"
         val sdf = SimpleDateFormat(dateFormat, Locale.getDefault())
         val selectedDate = sdf.format(calendar.time)
         dateEditText.setText(selectedDate)
@@ -244,7 +263,7 @@ class MainActivity : AppCompatActivity() {
         val selectedHour = calendar.get(Calendar.HOUR_OF_DAY)
         val selectedMinute = calendar.get(Calendar.MINUTE)
         val timeString = String.format(timeFormat, selectedHour, selectedMinute)
-        timeEditText.setText(timeString)
+        slotEditText.setText(timeString)
     }
 
     private fun createImageFile(): File {
@@ -255,7 +274,6 @@ class MainActivity : AppCompatActivity() {
             imageFilePath = absolutePath
         }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
