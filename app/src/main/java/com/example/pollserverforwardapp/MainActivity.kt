@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -23,6 +24,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +34,9 @@ import com.example.pollserverforwardapp.network.RetrofitApiClient
 import com.example.pollserverforwardapp.network.RetrofitApiInterface
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
@@ -58,6 +63,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private var imageFilePath: String? = null
     private lateinit var confirmButton: Button
+    private lateinit var fileNameTextView: TextView
+
 
     companion object{
         val apiInterface : RetrofitApiInterface = RetrofitApiClient.getUpload().create(RetrofitApiInterface::class.java)
@@ -75,6 +82,8 @@ class MainActivity : AppCompatActivity() {
         val progressBar: ProgressBar = findViewById(R.id.progressBar)
         val camaraButton: Button = findViewById(R.id.camaraButton)
         confirmButton.visibility = View.GONE
+//        val selectFileBtn = findViewById<Button>(R.id.selectFileBtn)
+//        val fileNameTextView = findViewById<TextView>(R.id.fileNameTextView)
 
         slotEditText.setOnClickListener {
             val items = arrayOf("09-10 am", "10-11 am","11-12 am","12-01 pm","01-02 pm", "03-04 pm", "05-06 pm")
@@ -90,6 +99,15 @@ class MainActivity : AppCompatActivity() {
             dialog.show()
         }
 
+//        selectFileBtn.setOnClickListener {
+//            val mimeTypes = arrayOf("application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+//            val intentSender = Drive.DriveApi.newOpenFileActivityBuilder()
+//                .setMimeType(mimeTypes)
+//                .build(getGoogleApiClient())
+//            startIntentSenderForResult(intentSender, REQUEST_CODE_PICK_FILE, null, 0, 0, 0)
+//        }
+
+
         calendar = Calendar.getInstance()
         if (!isSmsPermissionGranted()) {
             requestSmsPermission()
@@ -104,7 +122,8 @@ class MainActivity : AppCompatActivity() {
             val date = dateEditText.text.toString()
             val doctorName = doctorNameEdT.text.toString()
 
-            if (slot.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty()) { doctorNameEdT.clearFocus()
+            if (slot.isNotEmpty() && date.isNotEmpty() && doctorName.isNotEmpty()) {
+                doctorNameEdT.clearFocus()
                dispatchCapturePictureIntent()
             } else {
                 Toast.makeText(this@MainActivity, "Please fill all the required fields", Toast.LENGTH_SHORT).show()
@@ -267,7 +286,51 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+//        if (requestCode == REQUEST_CODE_PICK_FILE && resultCode == Activity.RESULT_OK) {
+//            val uri = data!!.data!!
+//            Drive.DriveApi.getFile(getGoogleApiClient(), DriveId.decodeFromString(uri.encodedPath))
+//                .addOnSuccessListener { driveFile ->
+//                    val fileName = driveFile.name
+//                    fileNameTextView.text = fileName
+//                    driveFile.openInputStream(getGoogleApiClient()).addOnSuccessListener { inputStream ->
+//                        val fileContent = inputStream.readBytes()
+//                        inputStream.close()
+//                        // Upload fileContent to your backend here
+////                        uploadToBackend(fileName, fileContent)
+//                    }
+//                }
+//        }
     }
+
+//    private fun uploadToBackend(fileName: String, fileContent: ByteArray) {
+//        // Replace this with your actual backend upload logic
+//        // using Retrofit, Volley, or any other HTTP library
+//        val url = "https://your-backend-url.com/upload"
+//        val requestBody = MultipartBody.Builder()
+//            .setType(MultipartBody.FORM)
+//            .addFormDataPart("file", fileName, RequestBody.create(MultipartBody.FORM, fileContent))
+//            .build()
+//        val request = Request.Builder()
+//            .url(url)
+//            .post(requestBody)
+//            .build()
+//        val client = OkHttpClient()
+//        client.newCall(request).enqueue(object : Callback {
+//            override fun onFailure(call: Call, e: IOException) {
+//                // Handle upload failure
+//                Log.e("Upload", "Error uploading file", e)
+//            }
+//
+//            override fun onResponse(call: Call, response: Response) {
+//                if (response.isSuccessful) {
+//                    // Handle successful upload
+//                    Log.d("Upload", "File uploaded successfully")
+//                } else {
+//                    Log.e("Upload", "Error uploading file: " + response.code)
+//                }
+//            }
+//        })
+//    }
 
     private fun rotateImageIfRequired(bitmap: Bitmap, imageFilePath: String): Bitmap {
         val ei = ExifInterface(imageFilePath)

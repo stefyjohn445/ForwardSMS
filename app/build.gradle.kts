@@ -37,6 +37,7 @@ android {
 
 dependencies {
 
+    //noinspection GradleCompatible,GradleCompatible,GradleCompatible
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
@@ -51,4 +52,11 @@ dependencies {
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
+//    implementation("com.google.android.gms:play-services-auth:16.0.1")
+//    implementation("com.google.api-client:google-api-client-android:1.33.2")
+//    implementation("com.google.apis:google-api-services-drive:v3-rev20230721-1.33.2-rc")
+//    implementation("com.google.http-client:google-http-client-gson:1.32.1")
+
+
 }
