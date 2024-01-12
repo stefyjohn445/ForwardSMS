@@ -23,15 +23,21 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Spinner
 import android.widget.TimePicker
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.example.pollserverforwardapp.models.ImageWithDataUploadResponse
 import com.example.pollserverforwardapp.network.RetrofitApiClient
 import com.example.pollserverforwardapp.network.RetrofitApiInterface
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -63,12 +69,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private var imageFilePath: String? = null
     private lateinit var confirmButton: Button
-    private lateinit var fileNameTextView: TextView
-
-
+//    private lateinit var uploadButton: Button
+//    private lateinit var fileNameTextView: TextView
     companion object{
         val apiInterface : RetrofitApiInterface = RetrofitApiClient.getUpload().create(RetrofitApiInterface::class.java)
     }
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +90,13 @@ class MainActivity : AppCompatActivity() {
         confirmButton.visibility = View.GONE
 //        val selectFileBtn = findViewById<Button>(R.id.selectFileBtn)
 //        val fileNameTextView = findViewById<TextView>(R.id.fileNameTextView)
+//        uploadButton = findViewById(R.id.uploadFileBtn)
+//        fileNameTextView = findViewById(R.id.fileNameTextView)
+
+//        uploadButton.setOnClickListener {
+//            // Call a function to handle file upload from Google Drive
+////            selectExcelFileFromDrive()
+//        }
 
         slotEditText.setOnClickListener {
             val items = arrayOf("09-10 am", "10-11 am","11-12 am","12-01 pm","01-02 pm", "03-04 pm", "05-06 pm")

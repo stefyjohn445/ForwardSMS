@@ -35,7 +35,7 @@ class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListen
     private lateinit var dateTV: TextView
     private lateinit var msgTV: TextView
     private lateinit var forwardSms: Button
-    private lateinit var nameAndPhoneNumbers: List<Patient>
+    private var nameAndPhoneNumbers: List<Patient> = emptyList()
     private lateinit var recyclerView: RecyclerView
     private lateinit var contactAdapter: ContactAdapter
 
@@ -50,12 +50,14 @@ class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forward_msg)
-        nameAndPhoneNumbers = emptyList()
+//        nameAndPhoneNumbers = emptyList()
 
 //    nameAndPhoneNumbers = responseData.data.toMutableList()
 
         val responseData = intent.getSerializableExtra("responseData") as? ImageWithDataUploadResponse
         if (responseData != null) {
+//            nameAndPhoneNumbers = responseData.data
+
             println("responseData---$responseData")
             nameTV= findViewById(R.id.nameTV)
             timeTV = findViewById(R.id.timeTV)
@@ -93,62 +95,62 @@ class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListen
     private fun sendSms(responseData: ImageWithDataUploadResponse) {
         try {
             val smsManager: SmsManager = SmsManager.getDefault()
-           val message = responseData.message
+            val message = responseData.message
             val url = responseData.url
-            for (nameAndPhoneNumbers in nameAndPhoneNumbers) {
-                val number = nameAndPhoneNumbers.number
-                val name = nameAndPhoneNumbers.name
-                val patient_id = nameAndPhoneNumbers.patient_id
-                val messageURL = "$message$url$patient_id"
-                println("messageURL---$messageURL")
-                    if (number != null) {
-                    println("url-------$url")
-                    println("url-message-----$messageURL")
-                    smsManager.sendTextMessage(number, null, messageURL, null, null)
-                    Toast.makeText(this@ForwardMsgActivity, "Messages Sent", Toast.LENGTH_LONG).show()
+                    for (nameAndPhoneNumbers in nameAndPhoneNumbers) {
+                        val number = nameAndPhoneNumbers.number
+                        val name = nameAndPhoneNumbers.name
+                        val patient_id = nameAndPhoneNumbers.patient_id
+                        val messageURL = "$message$url$patient_id"
+                        println("messageURL---$messageURL")
+                        if (number != null) {
+                            println("url-------$url")
+                            println("url-message-----$messageURL")
+                            smsManager.sendTextMessage(number, null, messageURL, null, null)
+                            Toast.makeText(this@ForwardMsgActivity, "Messages Sent", Toast.LENGTH_LONG).show()
+                        }
+                    }
+        }catch (ex: SecurityException) {
+                    // Handle SecurityException (Permission Issue)
+                    Toast.makeText(this@ForwardMsgActivity, "Permission Denied", Toast.LENGTH_LONG).show()
+                    ex.printStackTrace()
+                } catch (ex: Exception) {
+                    Toast.makeText(this@ForwardMsgActivity, ex.message.toString(), Toast.LENGTH_LONG).show()
+                    ex.printStackTrace()
+                }
+    }
+
+            private fun isSmsPermissionGranted(): Boolean {
+//        return checkSelfPermission(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
+                return ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.SEND_SMS
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+
+            private fun requestSmsPermission() {
+//        requestPermissions(arrayOf(Manifest.permission.SEND_SMS), SEND_SMS_PERMISSION_REQUEST_CODE)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.SEND_SMS),
+                    SEND_SMS_PERMISSION_REQUEST_CODE
+                )
+            }
+
+            override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+                if (requestCode == SEND_SMS_PERMISSION_REQUEST_CODE) {
+                    if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        // Permission granted, proceed with sending SMS
+                        sendSms(responseData)
+                    } else {
+                        // Permission denied, inform the user or disable the SMS feature
+                        Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
-        }catch (ex: SecurityException) {
-            // Handle SecurityException (Permission Issue)
-            Toast.makeText(this@ForwardMsgActivity, "Permission Denied", Toast.LENGTH_LONG).show()
-            ex.printStackTrace()
-        } catch (ex: Exception) {
-            Toast.makeText(this@ForwardMsgActivity, ex.message.toString(), Toast.LENGTH_LONG).show()
-            ex.printStackTrace()
-        }
-    }
 
-    private fun isSmsPermissionGranted(): Boolean {
-//        return checkSelfPermission(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
-        return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.SEND_SMS
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestSmsPermission() {
-//        requestPermissions(arrayOf(Manifest.permission.SEND_SMS), SEND_SMS_PERMISSION_REQUEST_CODE)
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.SEND_SMS),
-            SEND_SMS_PERMISSION_REQUEST_CODE
-        )
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == SEND_SMS_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, proceed with sending SMS
-                sendSms(responseData)
-            } else {
-                // Permission denied, inform the user or disable the SMS feature
-                Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    @SuppressLint("MissingInflatedId")
+            @SuppressLint("MissingInflatedId")
 //    override fun onContactEdit(patient: Patient, position: Int) {
 //        // Handle editing of the patient details here
 //        // For example, open an edit dialog or activity
@@ -187,65 +189,64 @@ class ForwardMsgActivity : AppCompatActivity(), ContactAdapter.ContactEditListen
 //        dialog.show()
 //    }
 
-    override fun onContactEdit(updatedName: String, updatedNumber: String, position: Int) {
-        // Handle editing of the patient details here
-        // For example, open an edit dialog or activity
-        // Update the 'contacts' list in the adapter after editing
-        // For example:
-        // contacts[position] = updatedPatientDetails
-        // contactAdapter.notifyItemChanged(position)
+            override fun onContactEdit(updatedName: String, updatedNumber: String, position: Int) {
+                // Handle editing of the patient details here
+                // For example, open an edit dialog or activity
+                // Update the 'contacts' list in the adapter after editing
+                // For example:
+                // contacts[position] = updatedPatientDetails
+                // contactAdapter.notifyItemChanged(position)
 //
-        val dialog = AlertDialog.Builder(this@ForwardMsgActivity)
-        val dialogView = layoutInflater.inflate(R.layout.edit_patient_dialog, null)
-        dialog.setView(dialogView)
+                val dialog = AlertDialog.Builder(this@ForwardMsgActivity)
+                val dialogView = layoutInflater.inflate(R.layout.edit_patient_dialog, null)
+                dialog.setView(dialogView)
 
-        val editedName = dialogView.findViewById<EditText>(R.id.editedName)
-        val editedNumber = dialogView.findViewById<EditText>(R.id.editedNumber)
+                val editedName = dialogView.findViewById<EditText>(R.id.editedName)
+                val editedNumber = dialogView.findViewById<EditText>(R.id.editedNumber)
 
 //        // Populate dialog fields with existing patient details
 //        editedName.setText(patient.name)
 //        editedNumber.setText(patient.number)
-        editedName.setText(updatedName)
-        editedNumber.setText(updatedNumber)
+                editedName.setText(updatedName)
+                editedNumber.setText(updatedNumber)
 //
-        dialog.setPositiveButton("Save") { _, _ ->
-            val updatedName = editedName.text.toString()
-            val updatedNumber = editedNumber.text.toString()
+                dialog.setPositiveButton("Save") { _, _ ->
+                    val updatedName = editedName.text.toString()
+                    val updatedNumber = editedNumber.text.toString()
 //
 //            // Update the patient details in the contacts list
-            nameAndPhoneNumbers[position].name = updatedName
-            nameAndPhoneNumbers[position].number = updatedNumber
-            val patientId = nameAndPhoneNumbers[position].patient_id
+                    nameAndPhoneNumbers[position].name = updatedName
+                    nameAndPhoneNumbers[position].number = updatedNumber
+                    val patientId = nameAndPhoneNumbers[position].patient_id
 //
 //            // Notify the adapter of the change
-            contactAdapter.notifyItemChanged(position)
+                    contactAdapter.notifyItemChanged(position)
 
-            apiInterface.updateNumber(updatedNumber,patientId).enqueue(object :
-                Callback<Message> {
-                override fun onResponse(call: Call<Message>, response: Response<Message>) {
-                    if (response.isSuccessful) {
-                        // Handle API success response
-                        val message = response.body()?.message ?: "Update successful"
-                        Toast.makeText(this@ForwardMsgActivity, message, Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Handle API error response
-                        Toast.makeText(this@ForwardMsgActivity, "Failed to update", Toast.LENGTH_SHORT).show()
-                    }
+                    apiInterface.updateNumber(updatedNumber,patientId).enqueue(object :
+                        Callback<Message> {
+                        override fun onResponse(call: Call<Message>, response: Response<Message>) {
+                            if (response.isSuccessful) {
+                                // Handle API success response
+                                val message = response.body()?.message ?: "Update successful"
+                                Toast.makeText(this@ForwardMsgActivity, message, Toast.LENGTH_SHORT).show()
+                            } else {
+                                // Handle API error response
+                                Toast.makeText(this@ForwardMsgActivity, "Failed to update", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<Message>, t: Throwable) {
+                            // Handle API call failure
+                            Toast.makeText(this@ForwardMsgActivity, "Network Error", Toast.LENGTH_SHORT).show()
+                        }
+                    })
                 }
 
-                override fun onFailure(call: Call<Message>, t: Throwable) {
-                    // Handle API call failure
-                    Toast.makeText(this@ForwardMsgActivity, "Network Error", Toast.LENGTH_SHORT).show()
+
+
+                dialog.setNegativeButton("Cancel") { _, _ ->
+                    // Handle cancel action if needed
                 }
-            })
+                dialog.show()
+            }
         }
-
-
-
-        dialog.setNegativeButton("Cancel") { _, _ ->
-            // Handle cancel action if needed
-        }
-        dialog.show()
-    }
-}
-
